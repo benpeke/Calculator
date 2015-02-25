@@ -11,7 +11,7 @@ import Foundation
 class CalculatorBrain {
     private enum Op : Printable {
         case Operand(Double)
-        case Variable(String, Double)
+        case Variable(String, () -> Double)
         case UnaryOperation(String, Double -> Double)
         case BinaryOperation(String, (Double, Double) -> Double)
         
@@ -46,7 +46,7 @@ class CalculatorBrain {
         learnOp(Op.UnaryOperation("√", sqrt))
         learnOp(Op.UnaryOperation("sin", sin))
         learnOp(Op.UnaryOperation("cos", cos))
-        learnOp(Op.Variable("π", M_PI))
+        learnOp(Op.Variable("π", {M_PI}))
         
     }
 
@@ -58,8 +58,7 @@ class CalculatorBrain {
             case .Operand(let operand):
                 return (operand, remainingOps)
             case .Variable(_, let variable):
-                remainingOps.append(Op.Operand(variable))
-                return evaluate(remainingOps)
+                return (variable(), remainingOps)
             case .UnaryOperation(_, let operation):
                 let operandEval = evaluate(remainingOps)
                 if let operand = operandEval.result {
@@ -96,7 +95,7 @@ class CalculatorBrain {
         return evaluate()
     }
 
-    func clear() {
-        opStack.removeAll(keepCapacity: false)
+    func showStack() -> String? {
+        return " ".join(opStack.map{ "\($0)" })
     }
 }

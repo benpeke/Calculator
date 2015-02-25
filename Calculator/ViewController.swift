@@ -23,24 +23,32 @@ class ViewController: UIViewController {
         set {
             display.text = "\(newValue)"
             userIsInTheMiddleOfTyping = false
+            historyDisplay.text = brain.showStack()
         }
     }
 
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
-        historyDisplay.text = historyDisplay.text! + digit
-        if (digit != "." || display.text!.rangeOfString(".") != nil) {
-            if (userIsInTheMiddleOfTyping) {
+        if userIsInTheMiddleOfTyping {
+            if (digit == ".") && (display.text!.rangeOfString(".") != nil) { return }
+            if (digit == "0") && (display.text == "0") { return }
+            if (digit != ".") && (display.text == "0") {
+                display.text = digit
+            } else {
                 display.text = display.text! + digit
+            }
+        } else {
+            if digit == "." {
+                display.text = "0."
             } else {
                 display.text = digit
-                userIsInTheMiddleOfTyping = true
             }
+            userIsInTheMiddleOfTyping = true
         }
     }
 
     @IBAction func clear(sender: UIButton) {
-        brain.clear()
+        brain = CalculatorBrain()
         display.text = "0"
     }
 
